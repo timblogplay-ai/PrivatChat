@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>TmChat</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<!-- ПОДКЛЮЧАЕМ БИБЛИОТЕКУ PEERJS ДЛЯ ЗВОНКОВ -->
+<script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
 <style>
   :root {
     --bg-color: #07070d; --panel-bg: rgba(18, 18, 30, 0.6); --border-color: rgba(255, 255, 255, 0.08);
@@ -87,7 +89,7 @@
   .reply-preview.active { display: block; }
   .reply-preview .close-reply { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer; font-weight: bold; }
   .input-row { display: flex; gap: 10px; align-items: center; }
-  .attach-btn, .emoji-btn { background: none; border: none; font-size: 22px; cursor: pointer; flex-shrink: 0; color: var(--text-muted); }
+  .attach-btn, .emoji-btn, .call-btn { background: none; border: none; font-size: 22px; cursor: pointer; flex-shrink: 0; color: var(--text-muted); }
   .input-area { flex: 1; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 16px; padding: 14px 16px; color: var(--text-main); outline: none; font-size: 15px; width: 100%; }
   .input-area:focus { border-color: var(--accent); }
   .send-btn { background: var(--my-msg-bg); color: #fff; border: none; border-radius: 16px; width: 50px; height: 50px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
@@ -124,6 +126,19 @@
 
   .back-btn { display: none; }
 
+  /* Окно звонка */
+  .call-modal { position: fixed; inset: 0; z-index: 300; background: rgba(0,0,0,0.9); display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: 0.3s; }
+  .call-modal.active { opacity: 1; pointer-events: auto; }
+  .call-avatar { width: 120px; height: 120px; border-radius: 50%; background: var(--my-msg-bg); display: flex; align-items: center; justify-content: center; font-size: 50px; font-weight: bold; color: #fff; margin-bottom: 20px; box-shadow: 0 0 30px var(--accent); }
+  .call-name { font-size: 24px; font-weight: 700; margin-bottom: 10px; }
+  .call-status { font-size: 16px; color: var(--text-muted); margin-bottom: 40px; }
+  .call-actions { display: flex; gap: 30px; }
+  .call-btn-action { width: 70px; height: 70px; border-radius: 50%; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 30px; color: #fff; transition: 0.2s; }
+  .call-btn-action.accept { background: #4ade80; }
+  .call-btn-action.reject { background: #ef4444; }
+  .call-btn-action.end { background: #ef4444; }
+  .call-btn-action:hover { transform: scale(1.1); }
+
   @media (max-width: 768px) {
     .sidebar { position: absolute; width: 100%; height: 100%; border-right: none; }
     .sidebar.hidden { transform: translateX(-100%); }
@@ -133,10 +148,11 @@
     .chat-header { padding: 10px 15px; gap: 10px; }
     .chat-header h2 { font-size: 16px; }
     .input-container { padding: 10px 15px; }
-    .attach-btn, .emoji-btn { font-size: 20px; }
+    .attach-btn, .emoji-btn, .call-btn { font-size: 20px; }
     .input-area { padding: 12px 14px; font-size: 14px; }
     .send-btn { width: 44px; height: 44px; }
     .profile-modal { padding: 20px; width: 90%; }
+    .call-avatar { width: 100px; height: 100px; font-size: 40px; }
   }
 </style>
 </head>
@@ -179,6 +195,8 @@
           <h2 id="headerName" style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;"></h2>
           <div class="status-text" id="headerStatus"></div>
         </div>
+        <!-- КНОПКА ЗВОНКА -->
+        <button class="call-btn" id="callBtn" title="Позвонить">📞</button>
       </div>
       
       <div class="messages-area" id="messagesArea" style="display:none;"></div>
@@ -241,6 +259,17 @@
     </div>
   </div>
 
+  <!-- ОКНО ЗВОНКА -->
+  <div class="call-modal" id="callModal">
+    <div class="call-avatar" id="callAvatar">?</div>
+    <div class="call-name" id="callName">Пользователь</div>
+    <div class="call-status" id="callStatus">Звонок...</div>
+    <div class="call-actions" id="callActions">
+      <!-- Кнопки будут добавлены через JS -->
+    </div>
+    <audio id="remoteAudio" autoplay></audio>
+  </div>
+
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
   import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
@@ -268,6 +297,11 @@
   let currentUser = null, activeChatId = null, activeFriend = null;
   let unsubscribeMessages = null, unsubscribeTyping = null;
   let allUsersData = {}, replyTo = null, lastMsgCount = 0, typingTimeout = null;
+
+  // ==== ЗВОНКИ (PEERJS) ====
+  let peer = null;
+  let currentCall = null;
+  let localStream = null;
 
   const AudioContext = window.AudioContext || window.webkitAudioContext;
   let audioCtx;
@@ -309,6 +343,7 @@
   document.getElementById('logoutBtn').addEventListener('click', () => {
     localStorage.removeItem('tm_friends');
     if (currentUser) set(ref(db, 'users/' + currentUser.uid + '/status'), 'Оффлайн');
+    if (peer) peer.destroy();
     signOut(auth);
   });
 
@@ -322,14 +357,131 @@
       const userRef = ref(db, 'users/' + user.uid);
       set(userRef, { name: user.displayName || user.email.split('@')[0], photo: user.photoURL, status: 'В сети' }, { merge: true });
       onDisconnect(userRef).update({ status: 'Был(а) недавно', lastSeen: serverTimestamp() });
+      
+      initPeer();
       loadAllUsers();
     } else {
       currentUser = null;
       document.getElementById('authScreen').classList.remove('hidden');
       document.getElementById('appContainer').classList.remove('active');
+      if (peer) peer.destroy();
     }
   });
 
+  // ==== ИНИЦИАЛИЗАЦИЯ PEERJS ====
+  function initPeer() {
+    // Используем Firebase UID как уникальный Peer ID (добавляем префикс для надежности)
+    peer = new Peer('tm_' + currentUser.uid);
+
+    peer.on('open', (id) => {
+      console.log('PeerJS подключен. Мой ID:', id);
+    });
+
+    peer.on('error', (err) => {
+      console.error('Ошибка PeerJS:', err);
+    });
+
+    // ВХОДЯЩИЙ ЗВОНОК
+    peer.on('call', (call) => {
+      playSound();
+      sendNotification('Входящий звонок', 'Вам звонит пользователь...');
+      
+      const callerId = call.peer.replace('tm_', '');
+      const callerName = allUsersData[callerId]?.name || 'Пользователь';
+
+      document.getElementById('callAvatar').textContent = callerName[0].toUpperCase();
+      document.getElementById('callName').textContent = callerName;
+      document.getElementById('callStatus').textContent = 'Входящий звонок...';
+      
+      const actions = document.getElementById('callActions');
+      actions.innerHTML = `
+        <button class="call-btn-action accept" id="acceptCallBtn">✅</button>
+        <button class="call-btn-action reject" id="rejectCallBtn">❌</button>
+      `;
+      
+      document.getElementById('callModal').classList.add('active');
+
+      document.getElementById('acceptCallBtn').onclick = async () => {
+        try {
+          localStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          call.answer(localStream);
+          currentCall = call;
+          setupCallEvents(call);
+          document.getElementById('callStatus').textContent = 'Разговор...';
+          actions.innerHTML = `<button class="call-btn-action end" id="endCallBtn">📴</button>`;
+          document.getElementById('endCallBtn').onclick = endCall;
+        } catch (e) {
+          alert("Не удалось получить доступ к микрофону.");
+          call.close();
+          document.getElementById('callModal').classList.remove('active');
+        }
+      };
+
+      document.getElementById('rejectCallBtn').onclick = () => {
+        call.close();
+        document.getElementById('callModal').classList.remove('active');
+      };
+    });
+  }
+
+  // ИСХОДЯЩИЙ ЗВОНОК
+  document.getElementById('callBtn').onclick = async () => {
+    if (!activeFriend) return;
+    
+    try {
+      localStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      
+      const friendPeerId = 'tm_' + activeFriend;
+      const call = peer.call(friendPeerId, localStream);
+      currentCall = call;
+
+      document.getElementById('callAvatar').textContent = document.getElementById('headerName').textContent[0].toUpperCase();
+      document.getElementById('callName').textContent = document.getElementById('headerName').textContent;
+      document.getElementById('callStatus').textContent = 'Вызов...';
+      
+      const actions = document.getElementById('callActions');
+      actions.innerHTML = `<button class="call-btn-action end" id="endCallBtn">📴</button>`;
+      document.getElementById('endCallBtn').onclick = endCall;
+      
+      document.getElementById('callModal').classList.add('active');
+
+      setupCallEvents(call);
+    } catch (e) {
+      alert("Не удалось получить доступ к микрофону.");
+    }
+  };
+
+  function setupCallEvents(call) {
+    call.on('stream', (remoteStream) => {
+      const audio = document.getElementById('remoteAudio');
+      audio.srcObject = remoteStream;
+      audio.play().catch(e => console.log("Autoplay blocked:", e));
+    });
+
+    call.on('close', () => {
+      endCall();
+    });
+    
+    call.on('error', (err) => {
+      console.error('Ошибка звонка:', err);
+      endCall();
+    });
+  }
+
+  function endCall() {
+    if (currentCall) {
+      currentCall.close();
+      currentCall = null;
+    }
+    if (localStream) {
+      localStream.getTracks().forEach(track => track.stop());
+      localStream = null;
+    }
+    document.getElementById('remoteAudio').srcObject = null;
+    document.getElementById('callModal').classList.remove('active');
+  }
+
+  // ==== ДАЛЬШЕ ИДЕТ СТАРЫЙ КОД (СПИСОК, ЧАТ, ФАЙЛЫ И Т.Д.) ====
   function loadAllUsers() {
     onValue(ref(db, 'users'), (snapshot) => {
       allUsersData = snapshot.val() || {};
@@ -578,4 +730,4 @@
   });
 </script>
 </body>
-</html>
+                          </html>
