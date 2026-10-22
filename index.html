@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>TmChat</title>
+<title>PrivatChat</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
 <style>
@@ -154,7 +154,7 @@
 
   <div class="auth-screen" id="authScreen">
     <div class="auth-box">
-      <h2>TmChat</h2>
+      <h2>PrivatChat</h2>
       <p>Мессенджер нового поколения</p>
       <button class="google-btn" id="googleLoginBtn">
         <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
@@ -167,7 +167,7 @@
     <div class="sidebar" id="sidebar">
       <div class="sidebar-header">
         <button class="menu-btn" id="menuBtn">☰</button>
-        <h1>TmChat</h1>
+        <h1>PrivatChat</h1>
         <div class="user-info">
           <img id="myAvatar" src="" alt="Avatar" title="Профиль">
         </div>
@@ -705,4 +705,4 @@
   function endCall() { if (currentCall) { currentCall.close(); currentCall = null; } if (localStream) { localStream.getTracks().forEach(t => t.stop()); localStream = null; } document.getElementById('remoteAudio').srcObject = null; document.getElementById('callModal').classList.remove('active'); }
 </script>
 </body>
-</html>
+  </html>
