@@ -13,30 +13,17 @@
   * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
   body { background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; background-image: radial-gradient(circle at 15% 50%, rgba(168, 85, 247, 0.15), transparent 25%), radial-gradient(circle at 85% 30%, rgba(34, 211, 238, 0.15), transparent 25%); }
   
-  /* Анимации */
   @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
   @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
   @keyframes pop { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
   @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
-  @keyframes winGlow { 0%, 100% { box-shadow: 0 0 10px #4ade80; } 50% { box-shadow: 0 0 30px #4ade80, 0 0 60px #4ade80; } }
+  @keyframes flipIn { 0% { transform: rotateY(90deg); } 100% { transform: rotateY(0deg); } }
 
-  /* Загрузочный экран (Катсцена) */
-  #introScreen {
-    position: fixed; inset: 0; z-index: 9999; background: #07070d;
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    animation: fadeIn 0.5s ease;
-  }
+  #introScreen { position: fixed; inset: 0; z-index: 9999; background: #07070d; display: flex; flex-direction: column; align-items: center; justify-content: center; animation: fadeIn 0.5s ease; }
   #introScreen.hidden { display: none; }
-  .intro-logo {
-    font-family: 'Press Start 2P', monospace; font-size: clamp(24px, 6vw, 48px);
-    background: linear-gradient(135deg, #a855f7, #22d3ee);
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    text-align: center; line-height: 1.4;
-    animation: pop 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
-  }
+  .intro-logo { font-family: 'Press Start 2P', monospace; font-size: clamp(24px, 6vw, 48px); background: linear-gradient(135deg, #a855f7, #22d3ee); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-align: center; line-height: 1.4; animation: pop 0.8s cubic-bezier(0.2, 0.8, 0.2, 1); }
   .intro-sub { color: var(--muted); margin-top: 20px; font-size: 14px; letter-spacing: 3px; text-transform: uppercase; animation: pulse 1.5s infinite; }
 
-  /* Хаб (Меню игр) */
   .app-container { max-width: 1200px; margin: 0 auto; padding: 30px 20px; animation: fadeIn 0.6s ease; }
   .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 40px; }
   .header h1 { font-family: 'Press Start 2P', monospace; font-size: 20px; background: linear-gradient(135deg, #a855f7, #22d3ee); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
@@ -44,64 +31,57 @@
   .back-chat:hover { background: rgba(255,255,255,0.1); transform: translateY(-2px); }
 
   .games-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
-  .game-card {
-    background: var(--panel); border: 1px solid var(--border); border-radius: 20px; padding: 25px;
-    display: flex; flex-direction: column; gap: 15px; cursor: pointer;
-    transition: transform 0.3s, box-shadow 0.3s; position: relative; overflow: hidden;
-    animation: slideUp 0.5s ease both;
-  }
+  .game-card { background: var(--panel); border: 1px solid var(--border); border-radius: 20px; padding: 25px; display: flex; flex-direction: column; gap: 15px; cursor: pointer; transition: transform 0.3s, box-shadow 0.3s; position: relative; overflow: hidden; animation: slideUp 0.5s ease both; }
   .game-card:hover { transform: translateY(-5px); box-shadow: 0 10px 30px rgba(168, 85, 247, 0.2); }
-  .game-card.disabled { opacity: 0.5; cursor: not-allowed; }
-  .game-card.disabled:hover { transform: none; box-shadow: none; }
   .game-icon { font-size: 50px; margin-bottom: 10px; }
   .game-card h2 { font-size: 20px; font-weight: 700; }
   .game-card p { color: var(--muted); font-size: 14px; line-height: 1.5; flex-grow: 1; }
   .game-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
   .badge-play { background: rgba(74, 222, 128, 0.15); color: #4ade80; }
-  .badge-soon { background: rgba(245, 158, 11, 0.15); color: #f59e0b; }
 
-  /* Интерфейс игры */
   .game-screen { display: none; animation: fadeIn 0.4s ease; }
   .game-screen.active { display: block; }
   .game-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
   .game-title { font-size: 24px; font-weight: 700; }
   
-  .lobby-box { background: var(--panel); border: 1px solid var(--border); border-radius: 20px; padding: 30px; max-width: 500px; margin: 0 auto; text-align: center; }
+  .lobby-box { background: var(--panel); border: 1px solid var(--border); border-radius: 20px; padding: 30px; max-width: 600px; margin: 0 auto; text-align: center; }
   .lobby-box h3 { margin-bottom: 15px; font-size: 22px; }
   .lobby-box p { color: var(--muted); margin-bottom: 20px; font-size: 14px; }
   .input-code { width: 100%; padding: 15px; border-radius: 12px; border: 1px solid var(--border); background: rgba(0,0,0,0.3); color: var(--text); font-size: 18px; text-align: center; letter-spacing: 5px; text-transform: uppercase; outline: none; margin-bottom: 15px; font-weight: 700; }
-  .input-code:focus { border-color: var(--accent); }
   .btn-main { width: 100%; padding: 15px; border-radius: 12px; border: none; background: linear-gradient(135deg, #a855f7, #22d3ee); color: #fff; font-weight: 700; font-size: 16px; cursor: pointer; transition: 0.2s; margin-bottom: 10px; }
   .btn-main:hover { transform: scale(1.02); }
   .btn-secondary { width: 100%; padding: 15px; border-radius: 12px; border: 1px solid var(--border); background: transparent; color: var(--text); font-weight: 600; cursor: pointer; transition: 0.2s; }
   .btn-secondary:hover { background: rgba(255,255,255,0.05); }
-  .room-code-display { font-size: 36px; font-weight: 800; letter-spacing: 8px; color: var(--accent-2); margin: 20px 0; font-family: 'Press Start 2P', monospace; }
+  .room-code-display { font-size: 30px; font-weight: 800; letter-spacing: 5px; color: var(--accent-2); margin: 15px 0; font-family: 'Press Start 2P', monospace; }
 
-  /* Крестики-нолики */
-  .ttt-board { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; max-width: 360px; margin: 20px auto; }
-  .ttt-cell { aspect-ratio: 1; background: rgba(255,255,255,0.05); border: 2px solid var(--border); border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 60px; font-weight: 800; cursor: pointer; transition: 0.2s; user-select: none; }
-  .ttt-cell:hover { background: rgba(255,255,255,0.1); }
-  .ttt-cell.x { color: var(--accent); text-shadow: 0 0 20px var(--accent); }
-  .ttt-cell.o { color: var(--accent-2); text-shadow: 0 0 20px var(--accent-2); }
-  .ttt-cell.win { animation: winGlow 1s infinite; background: rgba(74, 222, 128, 0.2); border-color: #4ade80; }
+  /* Игровые элементы */
+  .players-list { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 15px; }
+  .player-chip { padding: 8px 16px; border-radius: 20px; background: rgba(255,255,255,0.05); border: 1px solid var(--border); font-size: 14px; display: flex; align-items: center; gap: 8px; }
+  .player-chip.dead { opacity: 0.4; text-decoration: line-through; }
+  .player-chip.me { border-color: var(--accent); background: rgba(168, 85, 247, 0.1); }
 
-  /* Викторина */
-  .quiz-question { background: var(--panel); border: 1px solid var(--border); border-radius: 20px; padding: 30px; text-align: center; margin-bottom: 20px; }
-  .quiz-question h2 { font-size: 24px; margin-bottom: 20px; }
-  .quiz-options { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-  @media (max-width: 600px) { .quiz-options { grid-template-columns: 1fr; } }
-  .quiz-option { padding: 20px; border-radius: 15px; border: 2px solid var(--border); background: rgba(255,255,255,0.05); font-size: 16px; font-weight: 600; cursor: pointer; transition: 0.2s; color: var(--text); }
-  .quiz-option:hover { background: rgba(255,255,255,0.1); }
-  .quiz-option.correct { background: rgba(74, 222, 128, 0.2); border-color: #4ade80; }
-  .quiz-option.wrong { background: rgba(239, 68, 68, 0.2); border-color: #ef4444; }
-  .quiz-scores { margin-top: 20px; background: var(--panel); padding: 20px; border-radius: 15px; }
+  /* Мафия */
+  .mafia-night { background: #050510 !important; background-image: radial-gradient(circle at 50% 50%, rgba(30, 30, 80, 0.5), transparent 70%) !important; transition: background 1s; }
+  .mafia-day { background: #1a1510 !important; background-image: radial-gradient(circle at 50% 50%, rgba(100, 80, 30, 0.3), transparent 70%) !important; transition: background 1s; }
+  .role-card { background: var(--panel); border: 2px solid var(--accent); border-radius: 20px; padding: 30px; text-align: center; animation: flipIn 0.6s ease; }
+  .role-card h2 { font-size: 28px; margin-bottom: 10px; }
+  .role-card p { color: var(--muted); font-size: 15px; }
+
+  /* Бункер */
+  .bunker-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
+  .b-card { background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 15px; padding: 20px; text-align: center; cursor: pointer; transition: 0.3s; position: relative; overflow: hidden; }
+  .b-card:hover { background: rgba(255,255,255,0.1); }
+  .b-card.revealed { background: rgba(168, 85, 247, 0.15); border-color: var(--accent); animation: flipIn 0.5s ease; }
+  .b-card h4 { font-size: 12px; color: var(--muted); text-transform: uppercase; margin-bottom: 5px; }
+  .b-card p { font-size: 16px; font-weight: 600; }
+  .b-card .hidden-text { filter: blur(5px); user-select: none; }
+  .b-card.revealed .hidden-text { filter: none; user-select: auto; }
 
   .hidden { display: none !important; }
 </style>
 </head>
 <body>
 
-<!-- КАТСЦЕНА (Интро) -->
 <div id="introScreen">
   <div class="intro-logo">PRIVAT<br>GAMES</div>
   <div class="intro-sub">Загрузка вселенной...</div>
@@ -116,44 +96,31 @@
   <!-- ХАБ -->
   <div id="hub" class="game-screen active">
     <div class="games-grid">
-      
       <div class="game-card" onclick="startTTT()">
-        <div class="game-icon">❌⭕</div>
-        <h2>Крестики-нолики</h2>
-        <p>Классика на двоих. Создай комнату и скинь код другу.</p>
+        <div class="game-icon">❌⭕</div><h2>Крестики-нолики</h2><p>Классика на двоих. Создай комнату и скинь код другу.</p>
         <div><span class="game-badge badge-play">Играть</span></div>
       </div>
-
       <div class="game-card" onclick="startQuiz()">
-        <div class="game-icon">🧠</div>
-        <h2>Викторина (Кахут)</h2>
-        <p>Вопросы на скорость. Кто больше угадает — тот и победил.</p>
+        <div class="game-icon">🧠</div><h2>Викторина</h2><p>Вопросы на скорость. Кто больше угадает — тот и победил.</p>
         <div><span class="game-badge badge-play">Играть</span></div>
       </div>
-
-      <div class="game-card disabled">
-        <div class="game-icon">🕵️</div>
-        <h2>Мафия</h2>
-        <p>Роли, ночь, день и голосования. Скоро в PrivatChat.</p>
-        <div><span class="game-badge badge-soon">В разработке</span></div>
+      <div class="game-card" onclick="startMafia()">
+        <div class="game-icon">🕵️</div><h2>Мафия</h2><p>Ночь, день, роли и голосования. Для компании от 4 человек.</p>
+        <div><span class="game-badge badge-play">Играть</span></div>
       </div>
-
-      <div class="game-card disabled">
-        <div class="game-icon">☢️</div>
-        <h2>Бункер</h2>
-        <p>Выживание после апокалипсиса. Убеди всех, что ты нужен.</p>
-        <div><span class="game-badge badge-soon">В разработке</span></div>
+      <div class="game-card" onclick="startBunker()">
+        <div class="game-icon">☢️</div><h2>Бункер</h2><p>Выживание после апокалипсиса. Докажи, что ты нужен.</p>
+        <div><span class="game-badge badge-play">Играть</span></div>
       </div>
-
     </div>
   </div>
 
-  <!-- ЛОББИ (Общее для игр) -->
+  <!-- ЛОББИ -->
   <div id="lobby" class="game-screen">
     <div class="game-header"><div class="game-title" id="lobbyTitle">Игра</div><button class="back-chat" onclick="backToHub()">← Назад</button></div>
     <div class="lobby-box">
       <h3 id="lobbyStatus">Создайте комнату</h3>
-      <p>Скиньте код другу, чтобы он подключился.</p>
+      <p>Скиньте код друзьям, чтобы они подключились.</p>
       <button class="btn-main" onclick="createRoom()">Создать комнату</button>
       <div style="margin: 20px 0; color: var(--muted);">— ИЛИ —</div>
       <input type="text" id="joinCodeInput" class="input-code" placeholder="КОД" maxlength="6">
@@ -161,31 +128,74 @@
     </div>
   </div>
 
-  <!-- ИГРА: КРЕСТИКИ-НОЛИКИ -->
+  <!-- КРЕСТИКИ-НОЛИКИ -->
   <div id="tttGame" class="game-screen">
     <div class="game-header"><div class="game-title">Крестики-нолики</div><button class="back-chat" onclick="leaveGame()">Выйти</button></div>
     <div class="lobby-box" style="max-width: 600px;">
-      <h3 id="tttStatus" style="margin-bottom: 15px;">Ожидание игрока...</h3>
-      <div style="margin-bottom: 15px;">Код комнаты: <b id="tttRoomCode" style="color:var(--accent-2); font-size:18px;"></b></div>
-      <div class="ttt-board" id="tttBoard"></div>
+      <h3 id="tttStatus" style="margin-bottom: 15px;">Ожидание...</h3>
+      <div style="margin-bottom: 15px;">Код: <b id="tttRoomCode" style="color:var(--accent-2);"></b></div>
+      <div class="ttt-board" id="tttBoard" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; max-width: 300px; margin: 20px auto;"></div>
     </div>
   </div>
 
-  <!-- ИГРА: ВИКТОРИНА -->
+  <!-- ВИКТОРИНА -->
   <div id="quizGame" class="game-screen">
     <div class="game-header"><div class="game-title">Викторина</div><button class="back-chat" onclick="leaveGame()">Выйти</button></div>
     <div class="lobby-box" style="max-width: 800px;">
-      <h3 id="quizStatus">Ожидание игроков...</h3>
-      <div style="margin-bottom: 15px;">Код комнаты: <b id="quizRoomCode" style="color:var(--accent-2); font-size:18px;"></b></div>
-      
+      <h3 id="quizStatus">Ожидание...</h3>
+      <div style="margin-bottom: 15px;">Код: <b id="quizRoomCode" style="color:var(--accent-2);"></b></div>
       <div id="quizPlayArea" class="hidden">
-        <div class="quiz-question"><h2 id="quizQuestionText">Вопрос...</h2></div>
-        <div class="quiz-options" id="quizOptions"></div>
+        <div class="quiz-question"><h2 id="quizQuestionText"></h2></div>
+        <div class="quiz-options" id="quizOptions" style="display: grid; gap: 10px;"></div>
       </div>
+      <div class="quiz-scores" id="quizScoresArea" style="margin-top: 20px;"></div>
+    </div>
+  </div>
+
+  <!-- МАФИЯ -->
+  <div id="mafiaGame" class="game-screen">
+    <div class="game-header"><div class="game-title">Мафия</div><button class="back-chat" onclick="leaveGame()">Выйти</button></div>
+    <div class="lobby-box" style="max-width: 800px;">
+      <h3 id="mafiaStatus">Лобби</h3>
+      <div style="margin-bottom: 15px;">Код: <b id="mafiaRoomCode" style="color:var(--accent-2);"></b></div>
+      <div class="players-list" id="mafiaPlayersList"></div>
       
-      <div class="quiz-scores" id="quizScoresArea">
-        <h3>Счет игроков:</h3>
-        <div id="quizScoresList"></div>
+      <div id="mafiaHostControls" class="hidden" style="margin-top: 20px;">
+        <button class="btn-main" onclick="mafiaStartGame()">Начать игру</button>
+      </div>
+
+      <div id="mafiaRoleReveal" class="hidden" style="margin-top: 20px;">
+        <div class="role-card">
+          <h2 id="mafiaMyRole">Мирный житель</h2>
+          <p id="mafiaRoleDesc">Найдите мафию днем!</p>
+        </div>
+      </div>
+
+      <div id="mafiaActionArea" class="hidden" style="margin-top: 20px;">
+        <p id="mafiaActionText" style="margin-bottom: 10px;">Выберите игрока:</p>
+        <div class="players-list" id="mafiaActionTargets"></div>
+      </div>
+
+      <div id="mafiaPhaseTimer" style="margin-top: 20px; font-size: 24px; font-weight: bold; color: var(--accent);"></div>
+    </div>
+  </div>
+
+  <!-- БУНКЕР -->
+  <div id="bunkerGame" class="game-screen">
+    <div class="game-header"><div class="game-title">Бункер</div><button class="back-chat" onclick="leaveGame()">Выйти</button></div>
+    <div class="lobby-box" style="max-width: 800px;">
+      <h3 id="bunkerStatus">Лобби</h3>
+      <div style="margin-bottom: 15px;">Код: <b id="bunkerRoomCode" style="color:var(--accent-2);"></b></div>
+      <div class="players-list" id="bunkerPlayersList"></div>
+
+      <div id="bunkerHostControls" class="hidden" style="margin-top: 20px;">
+        <button class="btn-main" onclick="bunkerStartGame()">Начать игру</button>
+      </div>
+
+      <div id="bunkerPlayArea" class="hidden" style="margin-top: 20px;">
+        <p style="margin-bottom: 15px; color: var(--muted);">Нажми на карту, чтобы вскрыть её (одну за ход).</p>
+        <div class="bunker-cards" id="bunkerCards"></div>
+        <div class="players-list" id="bunkerVoteTargets" style="margin-top: 20px;"></div>
       </div>
     </div>
   </div>
@@ -200,277 +210,375 @@
   const firebaseConfig = { apiKey: "AIzaSyBU7JmPHXPo1j9aayKRpfhofUIXKQ7BKD8", authDomain: "privatchat-7b23c.firebaseapp.com", databaseURL: "https://privatchat-7b23c-default-rtdb.firebaseio.com", projectId: "privatchat-7b23c", storageBucket: "privatchat-7b23c.firebasestorage.app", messagingSenderId: "216193424935", appId: "1:216193424935:web:fbfa96a080d373b3253802" };
   const app = initializeApp(firebaseConfig), auth = getAuth(app), db = getDatabase(app);
 
-  let currentUser = null;
-  let currentGame = null; // 'ttt' or 'quiz'
-  let myRoomCode = null;
-  let unsubRoom = null;
-  
-  // TTT vars
-  let tttRole = null; // 'X' or 'O'
-  let tttBoardState = Array(9).fill(null);
-  let tttTurn = 'X';
-  let tttGameOver = false;
+  let currentUser = null, currentGame = null, myRoomCode = null, unsubRoom = null;
+  let allUsersData = {}; 
 
-  // Quiz vars
-  let quizRole = null;
-  const QUIZ_QUESTIONS = [
-    { q: "Какой блок в Minecraft самый крепкий?", o: ["Обсидиан", "Алмазный блок", "Бедрок", "Незеритовый блок"], a: 2 },
-    { q: "Сколько сердец у игрока в начале?", o: ["5", "10", "15", "20"], a: 1 },
-    { q: "Что нельзя скрафтить в Minecraft?", o: ["Элитры", "Кровать", "Меч", "Кирку"], a: 0 },
-    { q: "Какой моб взрывается?", o: ["Зомби", "Скелет", "Крипер", "Паук"], a: 2 },
-    { q: "Что нужно, чтобы попасть в Край?", o: ["Портал из обсидиана", "Глаза Эндера", "Алмазный ключ", "Кровать"], a: 1 }
-  ];
-  let currentQuestionIndex = 0;
+  // TTT
+  let tttRole = null, tttBoardState = Array(9).fill(null), tttTurn = 'X', tttGameOver = false;
+
+  // Quiz
+  const QUIZ_QUESTIONS = [ { q: "Самый крепкий блок?", o: ["Обсидиан", "Бедрок"], a: 1 }, { q: "Сколько сердец?", o: ["10", "20"], a: 1 } ];
   let myScore = 0;
 
-  // Катсцена (Интро)
-  setTimeout(() => {
-    document.getElementById('introScreen').classList.add('hidden');
-    document.getElementById('mainApp').style.display = 'block';
-  }, 2000);
+  // Mafia
+  let myMafiaRole = null;
 
-  // Проверка авторизации
+  // Bunker
+  let myBunkerCards = {};
+
+  // Инициализация
+  setTimeout(() => { document.getElementById('introScreen').classList.add('hidden'); document.getElementById('mainApp').style.display = 'block'; }, 2000);
+  
   onAuthStateChanged(auth, (user) => {
     if (user) {
       currentUser = user;
-    } else {
-      alert("Сначала войдите в аккаунт в чате!");
-      window.location.href = 'index.html';
-    }
+      onValue(ref(db, 'users'), snap => { allUsersData = snap.val() || {}; });
+    } else { window.location.href = 'index.html'; }
   });
 
-  window.backToHub = () => {
-    leaveGame();
-    document.querySelectorAll('.game-screen').forEach(s => s.classList.remove('active'));
-    document.getElementById('hub').classList.add('active');
-  };
-
+  window.backToHub = () => { leaveGame(); document.querySelectorAll('.game-screen').forEach(s => s.classList.remove('active')); document.getElementById('hub').classList.add('active'); };
   window.leaveGame = () => {
     if (unsubRoom) unsubRoom();
     if (myRoomCode) {
-      if (currentGame === 'ttt') {
-        remove(ref(db, 'tttGames/' + myRoomCode));
-      } else if (currentGame === 'quiz') {
-         // Просто уходим из списка игроков
-         update(ref(db, 'quizGames/' + myRoomCode + '/scores'), { [currentUser.uid]: null });
-      }
+      if (currentGame === 'ttt') remove(ref(db, 'tttGames/' + myRoomCode));
+      else if (currentGame === 'quiz') update(ref(db, 'quizGames/' + myRoomCode + '/scores'), { [currentUser.uid]: null });
+      else if (currentGame === 'mafia') update(ref(db, 'mafiaGames/' + myRoomCode + '/players/' + currentUser.uid), { alive: false });
+      else if (currentGame === 'bunker') update(ref(db, 'bunkerGames/' + myRoomCode + '/players/' + currentUser.uid), { alive: false });
     }
-    myRoomCode = null;
-    currentGame = null;
+    myRoomCode = null; currentGame = null;
     document.querySelectorAll('.game-screen').forEach(s => s.classList.remove('active'));
     document.getElementById('hub').classList.add('active');
   };
 
-  // === КРЕСТИКИ-НОЛИКИ ===
-  window.startTTT = () => {
-    currentGame = 'ttt';
+  function getPlayerName(uid) { return allUsersData[uid]?.name || 'Игрок'; }
+
+  // ================= КРЕСТИКИ-НОЛИКИ =================
+  window.startTTT = () => { currentGame = 'ttt'; openLobby('Крестики-нолики'); };
+  
+  // ================= ВИКТОРИНА =================
+  window.startQuiz = () => { currentGame = 'quiz'; openLobby('Викторина'); };
+
+  function openLobby(title) {
     document.querySelectorAll('.game-screen').forEach(s => s.classList.remove('active'));
     document.getElementById('lobby').classList.add('active');
-    document.getElementById('lobbyTitle').textContent = 'Крестики-нолики';
-  };
+    document.getElementById('lobbyTitle').textContent = title;
+  }
 
   window.createRoom = () => {
     const code = Math.random().toString(36).substring(2, 8).toUpperCase();
     myRoomCode = code;
     if (currentGame === 'ttt') {
-      tttRole = 'X';
-      set(ref(db, 'tttGames/' + code), { board: Array(9).fill(null), turn: 'X', players: { X: currentUser.uid, O: null } }).then(() => {
-        showTTTGame();
-      });
+      tttRole = 'X'; set(ref(db, 'tttGames/' + code), { board: Array(9).fill(null), turn: 'X', players: { X: currentUser.uid, O: null } }).then(showTTTGame);
     } else if (currentGame === 'quiz') {
-      set(ref(db, 'quizGames/' + code), { host: currentUser.uid, scores: { [currentUser.uid]: 0 }, currentQ: 0, status: 'lobby' }).then(() => {
-        showQuizGame();
-      });
+      set(ref(db, 'quizGames/' + code), { host: currentUser.uid, scores: { [currentUser.uid]: 0 }, currentQ: 0, status: 'lobby' }).then(showQuizGame);
+    } else if (currentGame === 'mafia') {
+      set(ref(db, 'mafiaGames/' + code), { host: currentUser.uid, status: 'lobby', players: { [currentUser.uid]: { role: 'none', alive: true } } }).then(showMafiaGame);
+    } else if (currentGame === 'bunker') {
+      set(ref(db, 'bunkerGames/' + code), { host: currentUser.uid, status: 'lobby', players: { [currentUser.uid]: { alive: true } } }).then(showBunkerGame);
     }
   };
 
   window.joinRoom = () => {
     const code = document.getElementById('joinCodeInput').value.trim().toUpperCase();
-    if (code.length !== 6) return alert("Введите 6-значный код!");
+    if (code.length !== 6) return alert("Введите код!");
     myRoomCode = code;
     
     if (currentGame === 'ttt') {
-      onValue(ref(db, 'tttGames/' + code), (snap) => {
-        const data = snap.val();
-        if (!data) return alert("Комната не найдена!");
-        if (!data.players.O && data.players.X !== currentUser.uid) {
-          tttRole = 'O';
-          update(ref(db, 'tttGames/' + code + '/players'), { O: currentUser.uid }).then(() => showTTTGame());
-        } else if (data.players.O === currentUser.uid) {
-          tttRole = 'O'; showTTTGame();
-        } else if (data.players.X === currentUser.uid) {
-          tttRole = 'X'; showTTTGame();
-        } else {
-          alert("Комната заполнена!");
-        }
+      onValue(ref(db, 'tttGames/' + code), snap => {
+        const data = snap.val(); if (!data) return alert("Не найдено!");
+        if (!data.players.O && data.players.X !== currentUser.uid) { tttRole = 'O'; update(ref(db, 'tttGames/' + code + '/players'), { O: currentUser.uid }).then(showTTTGame); }
+        else if (data.players.O === currentUser.uid) { tttRole = 'O'; showTTTGame(); }
+        else if (data.players.X === currentUser.uid) { tttRole = 'X'; showTTTGame(); }
       }, { onlyOnce: true });
-    } 
-    else if (currentGame === 'quiz') {
-      onValue(ref(db, 'quizGames/' + code), (snap) => {
-        const data = snap.val();
-        if (!data) return alert("Викторина не найдена!");
-        update(ref(db, 'quizGames/' + code + '/scores'), { [currentUser.uid]: 0 }).then(() => showQuizGame());
+    } else if (currentGame === 'quiz') {
+      onValue(ref(db, 'quizGames/' + code), snap => {
+        if (!snap.val()) return alert("Не найдено!");
+        update(ref(db, 'quizGames/' + code + '/scores'), { [currentUser.uid]: 0 }).then(showQuizGame);
+      }, { onlyOnce: true });
+    } else if (currentGame === 'mafia') {
+      onValue(ref(db, 'mafiaGames/' + code), snap => {
+        if (!snap.val()) return alert("Не найдено!");
+        update(ref(db, 'mafiaGames/' + code + '/players/' + currentUser.uid), { role: 'none', alive: true }).then(showMafiaGame);
+      }, { onlyOnce: true });
+    } else if (currentGame === 'bunker') {
+      onValue(ref(db, 'bunkerGames/' + code), snap => {
+        if (!snap.val()) return alert("Не найдено!");
+        update(ref(db, 'bunkerGames/' + code + '/players/' + currentUser.uid), { alive: true }).then(showBunkerGame);
       }, { onlyOnce: true });
     }
   };
 
+  // ================= ЛОГИКА TTT =================
   function showTTTGame() {
-    document.querySelectorAll('.game-screen').forEach(s => s.classList.remove('active'));
-    document.getElementById('tttGame').classList.add('active');
+    document.querySelectorAll('.game-screen').forEach(s => s.classList.remove('active')); document.getElementById('tttGame').classList.add('active');
     document.getElementById('tttRoomCode').textContent = myRoomCode;
-
     if (unsubRoom) unsubRoom();
     unsubRoom = onValue(ref(db, 'tttGames/' + myRoomCode), (snap) => {
-      const data = snap.val();
-      if (!data) { leaveGame(); return; }
-      
-      tttBoardState = data.board || Array(9).fill(null);
-      tttTurn = data.turn;
-      const p1 = data.players.X;
-      const p2 = data.players.O;
-      
+      const data = snap.val(); if (!data) return leaveGame();
+      tttBoardState = data.board || Array(9).fill(null); tttTurn = data.turn;
       const isMyTurn = (tttRole === 'X' && tttTurn === 'X') || (tttRole === 'O' && tttTurn === 'O');
+      if (!data.players.O) document.getElementById('tttStatus').textContent = "Ожидание друга...";
+      else if (tttGameOver) {}
+      else document.getElementById('tttStatus').textContent = isMyTurn ? "Твой ход!" : "Ход соперника...";
       
-      if (!p1 || !p2) {
-        document.getElementById('tttStatus').textContent = "Ожидание второго игрока...";
-      } else if (tttGameOver) {
-        // do nothing
-      } else {
-        document.getElementById('tttStatus').textContent = isMyTurn ? "Твой ход!" : "Ход соперника...";
-      }
-
-      renderTTTBoard();
-
-      // Проверка победы
+      const board = document.getElementById('tttBoard'); board.innerHTML = '';
+      tttBoardState.forEach((cell, i) => {
+        const d = document.createElement('div'); d.className = 'ttt-cell';
+        d.style.cssText = "aspect-ratio:1; background:rgba(255,255,255,0.05); border:2px solid var(--border); border-radius:15px; display:flex; align-items:center; justify-content:center; font-size:50px; font-weight:800; cursor:pointer; color:" + (cell==='X'?'var(--accent)':'var(--accent-2)');
+        d.textContent = cell || '';
+        d.onclick = () => { if (cell || tttGameOver || !isMyTurn) return; tttBoardState[i] = tttRole; update(ref(db, 'tttGames/' + myRoomCode), { board: tttBoardState, turn: tttTurn==='X'?'O':'X' }); };
+        board.appendChild(d);
+      });
       const win = checkWin(tttBoardState);
-      if (win && !tttGameOver) {
-        tttGameOver = true;
-        const iAmWinner = win === tttRole;
-        document.getElementById('tttStatus').textContent = iAmWinner ? "🎉 ТЫ ПОБЕДИЛ!" : "😢 Ты проиграл...";
-      } else if (!tttBoardState.includes(null) && !tttGameOver) {
-        tttGameOver = true;
-        document.getElementById('tttStatus').textContent = "🤝 Ничья!";
-      }
+      if (win && !tttGameOver) { tttGameOver = true; document.getElementById('tttStatus').textContent = win === tttRole ? "🎉 ТЫ ПОБЕДИЛ!" : "😢 Ты проиграл..."; }
     });
   }
+  function checkWin(b) { const l = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]]; for (let i of l) if (b[i[0]] && b[i[0]] === b[i[1]] && b[i[1]] === b[i[2]]) return b[i[0]]; return null; }
 
-  function renderTTTBoard() {
-    const board = document.getElementById('tttBoard');
-    board.innerHTML = '';
-    tttBoardState.forEach((cell, i) => {
-      const d = document.createElement('div');
-      d.className = 'ttt-cell';
-      if (cell === 'X') { d.classList.add('x'); d.textContent = 'X'; }
-      if (cell === 'O') { d.classList.add('o'); d.textContent = 'O'; }
-      if (cell && cell === tttRole && checkWin(tttBoardState) === tttRole) d.classList.add('win');
-      
-      d.onclick = () => {
-        if (cell || tttGameOver) return;
-        const isMyTurn = (tttRole === 'X' && tttTurn === 'X') || (tttRole === 'O' && tttTurn === 'O');
-        if (!isMyTurn) return;
-        
-        tttBoardState[i] = tttRole;
-        const nextTurn = tttTurn === 'X' ? 'O' : 'X';
-        update(ref(db, 'tttGames/' + myRoomCode), { board: tttBoardState, turn: nextTurn });
-      };
-      board.appendChild(d);
-    });
-  }
-
-  function checkWin(b) {
-    const lines = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
-    for (let line of lines) {
-      if (b[line[0]] && b[line[0]] === b[line[1]] && b[line[1]] === b[line[2]]) return b[line[0]];
-    }
-    return null;
-  }
-
-  // === ВИКТОРИНА ===
-  window.startQuiz = () => {
-    currentGame = 'quiz';
-    document.querySelectorAll('.game-screen').forEach(s => s.classList.remove('active'));
-    document.getElementById('lobby').classList.add('active');
-    document.getElementById('lobbyTitle').textContent = 'Викторина';
-  };
-
+  // ================= ЛОГИКА QUIZ =================
   function showQuizGame() {
-    document.querySelectorAll('.game-screen').forEach(s => s.classList.remove('active'));
-    document.getElementById('quizGame').classList.add('active');
+    document.querySelectorAll('.game-screen').forEach(s => s.classList.remove('active')); document.getElementById('quizGame').classList.add('active');
     document.getElementById('quizRoomCode').textContent = myRoomCode;
-    currentQuestionIndex = 0;
-    myScore = 0;
-
     if (unsubRoom) unsubRoom();
     unsubRoom = onValue(ref(db, 'quizGames/' + myRoomCode), (snap) => {
-      const data = snap.val();
-      if (!data) { leaveGame(); return; }
-
-      // Рендер счета
-      const scoresList = document.getElementById('quizScoresList');
-      scoresList.innerHTML = '';
-      if (data.scores) {
-        Object.keys(data.scores).forEach(uid => {
-          scoresList.innerHTML += `<div style="display:flex; justify-content:space-between; padding: 5px 0; border-bottom:1px solid var(--border);"><span>Игрок ${uid.substring(0,4)}</span> <b>${data.scores[uid]} очков</b></div>`;
-        });
-      }
-
+      const data = snap.val(); if (!data) return leaveGame();
+      const scoresList = document.getElementById('quizScoresArea'); scoresList.innerHTML = '<h3>Счет:</h3>';
+      if (data.scores) Object.keys(data.scores).forEach(uid => { scoresList.innerHTML += `<div style="display:flex; justify-content:space-between; padding: 5px; border-bottom:1px solid var(--border);"><span>${getPlayerName(uid)}</span> <b>${data.scores[uid]} очков</b></div>`; });
+      
       if (data.status === 'lobby') {
         document.getElementById('quizPlayArea').classList.add('hidden');
-        document.getElementById('quizStatus').textContent = "Ожидание старта от создателя комнаты...";
-        // Если я хост, показываю кнопку старта
-        if (data.host === currentUser.uid) {
-           document.getElementById('quizStatus').innerHTML = "Вы хост. <br><button class='btn-main' onclick='startQuizGame()' style='margin-top:10px;'>Начать игру!</button>";
-        }
-      } 
-      else if (data.status === 'playing') {
+        document.getElementById('quizStatus').innerHTML = data.host === currentUser.uid ? "Вы хост. <br><button class='btn-main' onclick='update(ref(db, \"quizGames/\"+myRoomCode), {status: \"playing\"})' style='margin-top:10px;'>Начать!</button>" : "Ожидание хоста...";
+      } else {
         document.getElementById('quizPlayArea').classList.remove('hidden');
-        document.getElementById('quizStatus').textContent = "Игра идет!";
-        if (data.currentQ < QUIZ_QUESTIONS.length) {
-          renderQuestion(data.currentQ);
-        } else {
-          // Конец игры
-          document.getElementById('quizStatus').textContent = "🏆 Игра окончена!";
-          document.getElementById('quizPlayArea').classList.add('hidden');
-        }
+        document.getElementById('quizStatus').textContent = "Игра!";
+        if (data.currentQ < QUIZ_QUESTIONS.length) renderQuestion(data.currentQ);
+        else { document.getElementById('quizStatus').textContent = "🏆 Игра окончена!"; document.getElementById('quizPlayArea').classList.add('hidden'); }
       }
     });
   }
-
-  window.startQuizGame = () => {
-    update(ref(db, 'quizGames/' + myRoomCode), { status: 'playing', currentQ: 0 });
-    // Хост сам показывает вопросы, а клиенты подхватывают
-  };
-
   function renderQuestion(index) {
-    const qData = QUIZ_QUESTIONS[index];
-    document.getElementById('quizQuestionText').textContent = qData.q;
-    const opts = document.getElementById('quizOptions');
-    opts.innerHTML = '';
-    
-    qData.o.forEach((opt, i) => {
-      const btn = document.createElement('button');
-      btn.className = 'quiz-option';
-      btn.textContent = opt;
-      btn.onclick = () => {
-        if (btn.classList.contains('correct') || btn.classList.contains('wrong')) return;
-        if (i === qData.a) {
-          btn.classList.add('correct');
-          myScore += 10;
-          update(ref(db, 'quizGames/' + myRoomCode + '/scores'), { [currentUser.uid]: myScore });
-        } else {
-          btn.classList.add('wrong');
-        }
-        
-        // Если я хост, через 2 секунды переключаю вопрос для всех
-        const isHost = Object.values(document.querySelectorAll('.quiz-option')).length > 0; 
-        // Упрощенно: пусть вопросы листает любой, кто нажал. 
-        setTimeout(() => {
-          update(ref(db, 'quizGames/' + myRoomCode), { currentQ: index + 1 });
-        }, 1500);
-      };
+    const q = QUIZ_QUESTIONS[index]; document.getElementById('quizQuestionText').textContent = q.q;
+    const opts = document.getElementById('quizOptions'); opts.innerHTML = '';
+    q.o.forEach((opt, i) => {
+      const btn = document.createElement('button'); btn.className = 'quiz-option'; btn.textContent = opt;
+      btn.style.cssText = "padding:15px; border-radius:10px; border:1px solid var(--border); background:rgba(255,255,255,0.05); cursor:pointer; font-size:16px; color:var(--text);";
+      btn.onclick = () => { if (btn.classList.contains('correct') || btn.classList.contains('wrong')) return; if (i === q.a) { btn.classList.add('correct'); btn.style.background = 'rgba(74,222,128,0.2)'; update(ref(db, 'quizGames/' + myRoomCode + '/scores'), { [currentUser.uid]: (myScore += 10) }); } else { btn.classList.add('wrong'); btn.style.background = 'rgba(239,68,68,0.2)'; } setTimeout(() => update(ref(db, 'quizGames/' + myRoomCode), { currentQ: index + 1 }), 1500); };
       opts.appendChild(btn);
     });
   }
+
+  // ================= ЛОГИКА МАФИИ =================
+  window.startMafia = () => { currentGame = 'mafia'; openLobby('Мафия'); };
+  function showMafiaGame() {
+    document.querySelectorAll('.game-screen').forEach(s => s.classList.remove('active')); document.getElementById('mafiaGame').classList.add('active');
+    document.getElementById('mafiaRoomCode').textContent = myRoomCode;
+    if (unsubRoom) unsubRoom();
+    
+    unsubRoom = onValue(ref(db, 'mafiaGames/' + myRoomCode), (snap) => {
+      const data = snap.val(); if (!data) return leaveGame();
+      const list = document.getElementById('mafiaPlayersList'); list.innerHTML = '';
+      let alivePlayers = [];
+      Object.keys(data.players).forEach(uid => {
+        if(data.players[uid].alive) alivePlayers.push(uid);
+        const chip = document.createElement('div'); chip.className = 'player-chip ' + (!data.players[uid].alive ? 'dead' : '') + (uid === currentUser.uid ? ' me' : ''); chip.textContent = getPlayerName(uid); list.appendChild(chip);
+      });
+
+      if (data.status === 'lobby') {
+        document.getElementById('mafiaStatus').textContent = `Лобби (${alivePlayers.length}/4 игроков)`;
+        document.getElementById('mafiaHostControls').classList.toggle('hidden', data.host !== currentUser.uid);
+        document.getElementById('mafiaRoleReveal').classList.add('hidden'); document.getElementById('mafiaActionArea').classList.add('hidden');
+      } 
+      else {
+        document.getElementById('mafiaHostControls').classList.add('hidden');
+        document.getElementById('mafiaRoleReveal').classList.remove('hidden');
+        document.getElementById('mafiaGame').className = 'game-screen active ' + (data.status === 'night' ? 'mafia-night' : 'mafia-day');
+        
+        myMafiaRole = data.players[currentUser.uid]?.role;
+        document.getElementById('mafiaMyRole').textContent = myMafiaRole.toUpperCase();
+        document.getElementById('mafiaRoleDesc').textContent = myMafiaRole === 'mafia' ? 'Убивай ночью!' : (myMafiaRole === 'doctor' ? 'Спасай ночью!' : 'Голосуй днем!');
+        
+        document.getElementById('mafiaActionArea').classList.add('hidden');
+        
+        if (data.status === 'night') {
+          document.getElementById('mafiaStatus').textContent = "🌙 Ночь. Город спит...";
+          if (data.players[currentUser.uid]?.alive) {
+            if (myMafiaRole === 'mafia' || myMafiaRole === 'doctor') {
+              document.getElementById('mafiaActionArea').classList.remove('hidden');
+              document.getElementById('mafiaActionText').textContent = myMafiaRole === 'mafia' ? "Выбери жертву:" : "Выбери, кого спасти:";
+              const targets = document.getElementById('mafiaActionTargets'); targets.innerHTML = '';
+              alivePlayers.forEach(uid => { if (uid !== currentUser.uid) { const b = document.createElement('button'); b.className = 'btn-secondary'; b.textContent = getPlayerName(uid); b.onclick = () => { update(ref(db, 'mafiaGames/' + myRoomCode + '/actions'), { [myMafiaRole]: uid }).then(() => { b.textContent = 'Выбрано'; b.disabled = true; }); }; targets.appendChild(b); } });
+            }
+          }
+        } else if (data.status === 'day') {
+          document.getElementById('mafiaStatus').textContent = "☀️ День. Обсуждайте!";
+          if (data.players[currentUser.uid]?.alive) {
+            document.getElementById('mafiaActionArea').classList.remove('hidden');
+            document.getElementById('mafiaActionText').textContent = "Кого казнить?";
+            const targets = document.getElementById('mafiaActionTargets'); targets.innerHTML = '';
+            alivePlayers.forEach(uid => { if (uid !== currentUser.uid) { const b = document.createElement('button'); b.className = 'btn-secondary'; b.textContent = getPlayerName(uid); b.onclick = () => { update(ref(db, 'mafiaGames/' + myRoomCode + '/votes'), { [currentUser.uid]: uid }).then(() => { b.textContent = 'Голос отдан'; b.disabled = true; }); }; targets.appendChild(b); } });
+          }
+        }
+      }
+      
+      // Кнопки управления хостом
+      if (data.host === currentUser.uid && data.status !== 'lobby' && data.status !== 'ended') {
+         let hostBtns = '';
+         if(data.status === 'night') hostBtns = `<button class='btn-main' style='margin-top:20px;' onclick='mafiaResolveNight()'>Завершить ночь</button>`;
+         if(data.status === 'day') hostBtns = `<button class='btn-main' style='margin-top:20px;' onclick='mafiaResolveDay()'>Завершить день</button>`;
+         document.getElementById('mafiaStatus').innerHTML += hostBtns;
+      }
+    });
+  }
+
+  window.mafiaStartGame = () => {
+    onValue(ref(db, 'mafiaGames/' + myRoomCode + '/players'), snap => {
+       const players = Object.keys(snap.val());
+       if(players.length < 4) return alert("Нужно минимум 4 игрока!");
+       let roles = ['mafia', 'doctor'];
+       while(roles.length < players.length) roles.push('citizen');
+       roles = roles.sort(() => Math.random() - 0.5);
+       
+       let updates = { status: 'night' };
+       players.forEach((uid, i) => { updates['players/'+uid+'/role'] = roles[i]; });
+       update(ref(db, 'mafiaGames/' + myRoomCode), updates);
+    }, { onlyOnce: true });
+  };
+
+  window.mafiaResolveNight = () => {
+    onValue(ref(db, 'mafiaGames/' + myRoomCode), snap => {
+      const data = snap.val();
+      const actions = data.actions || {};
+      const target = actions.mafia;
+      const heal = actions.doctor;
+      
+      if (target && target !== heal) {
+        update(ref(db, 'mafiaGames/' + myRoomCode + '/players/' + target), { alive: false });
+      }
+      update(ref(db, 'mafiaGames/' + myRoomCode), { status: 'day', actions: null, votes: null });
+    }, { onlyOnce: true });
+  };
+
+  window.mafiaResolveDay = () => {
+    onValue(ref(db, 'mafiaGames/' + myRoomCode), snap => {
+      const data = snap.val();
+      const votes = data.votes || {};
+      let counts = {};
+      Object.values(votes).forEach(t => counts[t] = (counts[t] || 0) + 1);
+      let maxVotes = 0, kicked = null;
+      for (let t in counts) { if (counts[t] > maxVotes) { maxVotes = counts[t]; kicked = t; } }
+      
+      if (kicked) update(ref(db, 'mafiaGames/' + myRoomCode + '/players/' + kicked), { alive: false });
+      
+      // Проверка победы
+      let mafiaAlive = 0, citizensAlive = 0;
+      Object.values(data.players).forEach(p => { if (p.alive) { if (p.role === 'mafia') mafiaAlive++; else citizensAlive++; } });
+      
+      if (mafiaAlive === 0) update(ref(db, 'mafiaGames/' + myRoomCode), { status: 'ended' }).then(() => alert("Мирные победили!"));
+      else if (mafiaAlive >= citizensAlive) update(ref(db, 'mafiaGames/' + myRoomCode), { status: 'ended' }).then(() => alert("Мафия победила!"));
+      else update(ref(db, 'mafiaGames/' + myRoomCode), { status: 'night', votes: null });
+    }, { onlyOnce: true });
+  };
+
+  // ================= ЛОГИКА БУНКЕРА =================
+  window.startBunker = () => { currentGame = 'bunker'; openLobby('Бункер'); };
+  const BUNKER_DATA = {
+    prof: ['Врач', 'Инженер', 'Военный', 'Учитель', 'Программист', 'Повар'],
+    health: ['Абсолютно здоров', 'Астма', 'Аллергия', 'Идеальное зрение', 'Слепой на один глаз'],
+    hobby: ['Рыбалка', 'Чтение', 'Стрельба', 'Ремонт техники', 'Кулинария'],
+    phobia: ['Клаустрофобия', 'Боязнь темноты', 'Нет фобий', 'Боязнь микробов'],
+    secret: ['Бесплоден', 'Ворует еду', 'Умеет взламывать замки', 'Бывший заключенный', 'Имеет скрытый нож']
+  };
+
+  function showBunkerGame() {
+    document.querySelectorAll('.game-screen').forEach(s => s.classList.remove('active')); document.getElementById('bunkerGame').classList.add('active');
+    document.getElementById('bunkerRoomCode').textContent = myRoomCode;
+    if (unsubRoom) unsubRoom();
+    
+    unsubRoom = onValue(ref(db, 'bunkerGames/' + myRoomCode), (snap) => {
+      const data = snap.val(); if (!data) return leaveGame();
+      const list = document.getElementById('bunkerPlayersList'); list.innerHTML = '';
+      let alivePlayers = [];
+      Object.keys(data.players).forEach(uid => {
+        if(data.players[uid].alive) alivePlayers.push(uid);
+        const chip = document.createElement('div'); chip.className = 'player-chip ' + (!data.players[uid].alive ? 'dead' : '') + (uid === currentUser.uid ? ' me' : ''); chip.textContent = getPlayerName(uid); list.appendChild(chip);
+      });
+
+      if (data.status === 'lobby') {
+        document.getElementById('bunkerStatus').textContent = `Лобби (${alivePlayers.length}/4)`;
+        document.getElementById('bunkerHostControls').classList.toggle('hidden', data.host !== currentUser.uid);
+        document.getElementById('bunkerPlayArea').classList.add('hidden');
+      } 
+      else if (data.status === 'play') {
+        document.getElementById('bunkerHostControls').classList.add('hidden');
+        document.getElementById('bunkerPlayArea').classList.remove('hidden');
+        document.getElementById('bunkerStatus').textContent = `В бункере мест: ${Math.floor(alivePlayers.length / 2)}. Обсуждайте!`;
+        
+        // Карточки
+        const myData = data.players[currentUser.uid];
+        if(myData && myData.cards) {
+          const cardsBox = document.getElementById('bunkerCards'); cardsBox.innerHTML = '';
+          const keys = ['prof', 'health', 'hobby', 'phobia', 'secret'];
+          const labels = ['Профессия', 'Здоровье', 'Хобби', 'Фобия', 'Секрет'];
+          keys.forEach((k, i) => {
+            const div = document.createElement('div'); div.className = 'b-card ' + (myData.revealed && myData.revealed[k] ? 'revealed' : '');
+            div.innerHTML = `<h4>${labels[i]}</h4><p class="${myData.revealed && myData.revealed[k] ? '' : 'hidden-text'}">${myData.cards[k]}</p>`;
+            div.onclick = () => { if(!myData.revealed || !myData.revealed[k]) update(ref(db, 'bunkerGames/' + myRoomCode + '/players/' + currentUser.uid + '/revealed'), { [k]: true }); };
+            cardsBox.appendChild(div);
+          });
+        }
+        
+        // Голосование
+        const targets = document.getElementById('bunkerVoteTargets'); targets.innerHTML = '<p style="width:100%; text-align:center; margin-top:20px; font-size:14px; color:var(--muted);">Голосуйте, кого выгнать:</p>';
+        alivePlayers.forEach(uid => { if (uid !== currentUser.uid) { const b = document.createElement('button'); b.className = 'btn-secondary'; b.style.width = 'auto'; b.textContent = getPlayerName(uid); b.onclick = () => { update(ref(db, 'bunkerGames/' + myRoomCode + '/votes'), { [currentUser.uid]: uid }).then(() => { b.textContent = 'Голос отдан'; b.disabled = true; }); }; targets.appendChild(b); } });
+      }
+      
+      if (data.host === currentUser.uid && data.status === 'play') {
+         document.getElementById('bunkerStatus').innerHTML += `<br><button class='btn-main' style='margin-top:20px;' onclick='bunkerResolveVote()'>Посчитать голоса</button>`;
+      }
+    });
+  }
+
+  window.bunkerStartGame = () => {
+    onValue(ref(db, 'bunkerGames/' + myRoomCode + '/players'), snap => {
+       const players = Object.keys(snap.val());
+       if(players.length < 4) return alert("Нужно минимум 4 игрока!");
+       let updates = { status: 'play' };
+       players.forEach(uid => {
+         updates['players/'+uid+'/cards'] = {
+           prof: BUNKER_DATA.prof[Math.floor(Math.random() * BUNKER_DATA.prof.length)],
+           health: BUNKER_DATA.health[Math.floor(Math.random() * BUNKER_DATA.health.length)],
+           hobby: BUNKER_DATA.hobby[Math.floor(Math.random() * BUNKER_DATA.hobby.length)],
+           phobia: BUNKER_DATA.phobia[Math.floor(Math.random() * BUNKER_DATA.phobia.length)],
+           secret: BUNKER_DATA.secret[Math.floor(Math.random() * BUNKER_DATA.secret.length)]
+         };
+         updates['players/'+uid+'/revealed'] = {};
+       });
+       update(ref(db, 'bunkerGames/' + myRoomCode), updates);
+    }, { onlyOnce: true });
+  };
+
+  window.bunkerResolveVote = () => {
+    onValue(ref(db, 'bunkerGames/' + myRoomCode), snap => {
+      const data = snap.val();
+      const votes = data.votes || {};
+      let counts = {};
+      Object.values(votes).forEach(t => counts[t] = (counts[t] || 0) + 1);
+      let maxVotes = 0, kicked = null;
+      for (let t in counts) { if (counts[t] > maxVotes) { maxVotes = counts[t]; kicked = t; } }
+      
+      if (kicked) update(ref(db, 'bunkerGames/' + myRoomCode + '/players/' + kicked), { alive: false });
+      
+      let aliveCount = Object.values(data.players).filter(p => p.alive).length;
+      let capacity = Math.floor(aliveCount / 2);
+      
+      if (aliveCount <= capacity) {
+         update(ref(db, 'bunkerGames/' + myRoomCode), { status: 'ended' }).then(() => alert("Игра окончена! Выжившие определены."));
+      } else {
+         update(ref(db, 'bunkerGames/' + myRoomCode), { votes: null });
+      }
+    }, { onlyOnce: true });
+  };
+
 </script>
 </body>
   </html>
