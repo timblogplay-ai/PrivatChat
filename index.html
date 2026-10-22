@@ -115,10 +115,13 @@
   .input-container { background: var(--panel-bg); border-top: 1px solid var(--border-color); padding: 10px 15px; display: flex; flex-direction: column; flex-shrink: 0; }
   .reply-preview { display: none; background: rgba(0,0,0,0.2); border-left: 3px solid var(--accent); padding: 6px; margin-bottom: 8px; border-radius: 6px; font-size: 12px; }
   .reply-preview.active { display: block; }
-  .input-row { display: flex; gap: 8px; align-items: center; }
-  .attach-btn, .emoji-btn, .voice-btn, .geo-btn { background: none; border: none; font-size: 20px; cursor: pointer; color: var(--text-muted); flex-shrink: 0; }
-  .input-area { flex: 1; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 16px; padding: 12px 15px; color: var(--text-main); outline: none; font-size: 14px; }
-  .send-btn { background: var(--my-msg-bg); color: #fff; border: none; border-radius: 16px; width: 44px; height: 44px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+  
+  .input-row { display: flex; gap: 8px; align-items: center; width: 100%; }
+  .attach-btn, .emoji-btn, .voice-btn, .geo-btn { background: none; border: none; font-size: 20px; cursor: pointer; color: var(--text-muted); flex-shrink: 0; transition: color 0.2s; }
+  .attach-btn:hover, .emoji-btn:hover, .voice-btn:hover, .geo-btn:hover { color: var(--text-main); }
+  
+  .input-area { flex: 1; min-width: 0; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 16px; padding: 12px 15px; color: var(--text-main); outline: none; font-size: 14px; }
+  .send-btn { background: var(--my-msg-bg); color: #fff; border: none; border-radius: 16px; width: 44px; height: 44px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
   .voice-btn.recording { color: #ef4444; animation: pulse 1s infinite; }
   @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
 
@@ -161,12 +164,30 @@
   #remoteVideo { display: none; width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; z-index: -1; }
   #localVideo { display: none; width: 100px; height: 150px; position: absolute; bottom: 100px; right: 20px; border-radius: 10px; border: 2px solid var(--accent); object-fit: cover; z-index: 10; }
 
+  /* МОБИЛЬНАЯ АДАПТАЦИЯ */
   @media (max-width: 768px) {
     .sidebar { position: absolute; width: 100%; height: 100%; border-right: none; }
     .sidebar.hidden { transform: translateX(-100%); }
     .main-chat { width: 100%; }
     .back-btn { display: block; }
     .message-container { max-width: 90%; }
+    
+    /* Уменьшаем панель ввода для телефонов */
+    .input-container { padding: 8px 10px; }
+    .input-row { gap: 5px; }
+    .attach-btn, .geo-btn, .voice-btn { font-size: 18px; }
+    .input-area { padding: 10px 12px; font-size: 13px; }
+    .send-btn { width: 38px; height: 38px; min-width: 38px; border-radius: 12px; }
+    .send-btn svg { width: 16px; height: 16px; }
+  }
+
+  @media (max-width: 380px) {
+    /* Для очень узких экранов (например, iPhone SE) */
+    .input-row { gap: 3px; }
+    .attach-btn, .geo-btn, .voice-btn { font-size: 16px; }
+    .input-area { padding: 8px 10px; font-size: 12px; }
+    .send-btn { width: 34px; height: 34px; min-width: 34px; border-radius: 10px; }
+    .send-btn svg { width: 14px; height: 14px; }
   }
 </style>
 </head>
@@ -456,7 +477,6 @@
       }
     });
 
-    // Сортировка: закрепленные наверх
     allChats.sort((a, b) => {
       const aPin = pinnedChats.includes(a.id);
       const bPin = pinnedChats.includes(b.id);
@@ -476,7 +496,6 @@
         ${avatarHtml}
         <div class="chat-info"><h3>${chat.name}</h3><p>${chat.sub}</p></div>`;
       
-      // ПКМ или долгое нажатие для закрепления
       div.oncontextmenu = (e) => {
         e.preventDefault();
         let pins = JSON.parse(localStorage.getItem('tm_pinned_chats') || '[]');
@@ -534,7 +553,6 @@
     document.getElementById('callBtn').style.display = type === 'group' ? 'none' : 'block';
     document.getElementById('replyPreview').classList.remove('active');
 
-    // Настройки исчезающих сообщений
     burnTimerEnabled = localStorage.getItem('tm_burn_' + activeChatId) === 'true';
     document.getElementById('burnTimerToggle').checked = burnTimerEnabled;
 
@@ -557,7 +575,6 @@
         Object.keys(msgs).forEach(key => {
           const m = msgs[key]; currentCount++;
           
-          // Логика исчезающих сообщений
           if (m.expiresAt && Date.now() > m.expiresAt) {
              remove(ref(db, 'messages/' + activeChatId + '/' + key));
              return;
@@ -727,10 +744,7 @@
     const time = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
     const msgData = { sender: currentUser.uid, text: text, time: time };
     
-    // Добавляем таймер, если включен
-    if (burnTimerEnabled) {
-      msgData.expiresAt = Date.now() + 60000; // 60 секунд
-    }
+    if (burnTimerEnabled) msgData.expiresAt = Date.now() + 60000;
 
     if (replyTo) { msgData.replyTo = replyTo; replyTo = null; document.getElementById('replyPreview').classList.remove('active'); }
     push(ref(db, 'messages/' + activeChatId), msgData);
