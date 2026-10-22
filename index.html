@@ -26,7 +26,6 @@
   ::-webkit-scrollbar { width: 6px; } ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 10px; }
 
-  /* Анимации */
   @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
   @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
   @keyframes popIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
@@ -153,12 +152,14 @@
   .call-modal.active { opacity: 1; pointer-events: auto; }
   .call-avatar { width: 100px; height: 100px; border-radius: 50%; background: var(--my-msg-bg); display: flex; align-items: center; justify-content: center; font-size: 40px; font-weight: bold; color: #fff; margin-bottom: 20px; animation: pulse 2s infinite; }
   .call-name { font-size: 22px; font-weight: 700; margin-bottom: 10px; }
-  .call-status { font-size: 15px; color: var(--text-muted); margin-bottom: 30px; }
-  .call-actions { display: flex; gap: 30px; }
-  .call-btn-action { width: 60px; height: 60px; border-radius: 50%; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 26px; color: #fff; transition: transform 0.2s; }
+  .call-status { font-size: 15px; color: var(--text-muted); margin-bottom: 30px; font-weight: 600; color: var(--accent-2); }
+  .call-actions { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; }
+  .call-btn-action { width: 60px; height: 60px; border-radius: 50%; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 24px; color: #fff; transition: transform 0.2s, background 0.3s; }
   .call-btn-action:hover { transform: scale(1.1); }
   .call-btn-action.accept { background: #4ade80; }
   .call-btn-action.reject, .call-btn-action.end { background: #ef4444; }
+  .call-btn-action.mute { background: #f59e0b; }
+  .call-btn-action.mute.muted { background: #6b7280; }
   #remoteAudio { display: none; }
 
   @media (max-width: 768px) {
@@ -301,6 +302,7 @@
   </div>
 </div>
 
+<!-- ОКНО ЗВОНКА -->
 <div class="call-modal" id="callModal">
   <div class="call-avatar" id="callAvatar">?</div>
   <div class="call-name" id="callName"></div>
@@ -321,7 +323,7 @@
   const CLOUDINARY_UPLOAD_PRESET = "PrivatChat";
 
   let currentUser=null, activeChatId=null, activeFriend=null, activeChatType='direct', unsubscribeMessages=null, unsubscribeTyping=null, allUsersData={}, allGroupsData={}, lastMsgCount=0, typingTimeout=null, currentFilter='all';
-  let peer=null, currentCall=null, localStream=null, mediaRecorder=null, audioChunks=[], isRecording=false;
+  let peer=null, currentCall=null, localStream=null, mediaRecorder=null, audioChunks=[], isRecording=false, isMuted=false;
 
   // --- УВЕДОМЛЕНИЯ И ЗВУК ---
   function playSound() {
@@ -373,15 +375,7 @@
   });
 
   function loadAllData() {
-    onValue(ref(db, 'users'), (snap) => {
-      allUsersData = snap.val() || {};
-      renderChats();
-      // Проверка на новые сообщения для уведомлений (глобально)
-      if (document.hidden && currentUser) {
-         let totalUnread = 0;
-         // Здесь можно было бы считать непрочитанные, но пока просто меняем title если вкладка скрыта
-      }
-    });
+    onValue(ref(db, 'users'), (snap) => { allUsersData = snap.val() || {}; renderChats(); });
     onValue(ref(db, 'groups'), (snap) => { allGroupsData = snap.val() || {}; renderChats(); });
   }
 
@@ -498,7 +492,6 @@
           let fwdHtml = m.forwarded ? `<div class="msg-fwd">Переслано от ${allUsersData[m.sender]?.name || 'Пользователя'}</div>` : '';
           let readStatus = ''; if (isMine) { const isRead = m.readBy && Object.keys(m.readBy).length > 0; readStatus = `<span class="read-status ${isRead ? 'read' : ''}">${isRead ? '✓✓' : '✓'}</span>`; }
           
-          // Только пересылка и удаление
           let actionsHtml = `<div class="msg-actions">
             <button class="fwd" data-text="${m.text || 'Файл'}">➡️</button>
             <button class="delete" data-id="${key}">🗑</button>
@@ -518,7 +511,6 @@
         });
       }
       
-      // Обработчики
       document.querySelectorAll('.msg-actions .delete').forEach(btn => { 
         btn.onclick = (e) => { e.stopPropagation(); remove(ref(db, 'messages/' + activeChatId + '/' + btn.getAttribute('data-id'))); }; 
       });
@@ -534,7 +526,6 @@
 
       if (isScrolledToBottom) setTimeout(() => area.scrollTop = area.scrollHeight, 50);
       
-      // УВЕДОМЛЕНИЕ И ЗВУК
       if (currentCount > lastMsgCount && lastMsgCount !== 0) {
         const msgsArray = Object.values(msgs || {});
         const lastMsg = msgsArray[msgsArray.length - 1];
@@ -556,7 +547,6 @@
     });
   }
 
-  // Сброс заголовка при возвращении на вкладку
   window.onfocus = () => { document.title = 'PrivatChat'; };
 
   // --- ВВОД И ОТПРАВКА ---
@@ -651,9 +641,8 @@
 
   document.getElementById('backBtn').onclick = () => { document.getElementById('sidebar').classList.remove('hidden'); document.getElementById('noChat').style.display = 'flex'; document.getElementById('chatHeader').style.display = 'none'; document.getElementById('messagesArea').style.display = 'none'; document.getElementById('inputContainer').style.display = 'none'; document.getElementById('typingIndicator').style.display = 'none'; activeChatId = null; if (unsubscribeMessages) unsubscribeMessages(); if (unsubscribeTyping) unsubscribeTyping(); };
 
-  // --- СТАБИЛЬНЫЕ АУДИО-ЗВОНКИ (PeerJS) ---
+  // --- ИСПРАВЛЕННЫЕ ЗВОНКИ (PeerJS) ---
   function initPeer() {
-    // Добавляем STUN-серверы Google для пробивания NAT
     peer = new Peer('tm_' + currentUser.uid, {
       config: { 'iceServers': [{ 'urls': 'stun:stun.l.google.com:19302' }, { 'urls': 'stun:stun1.l.google.com:19302' }] }
     });
@@ -672,7 +661,11 @@
           localStream = await navigator.mediaDevices.getUserMedia({ audio: true });
           call.answer(localStream); currentCall = call; setupCall(call);
           document.getElementById('callStatus').textContent = 'Разговор...';
-          document.getElementById('callActions').innerHTML = `<button class="call-btn-action end" id="end">📴</button>`;
+          document.getElementById('callActions').innerHTML = `
+            <button class="call-btn-action mute" id="muteBtn" title="Микрофон">🎤</button>
+            <button class="call-btn-action end" id="end">📴</button>
+          `;
+          document.getElementById('muteBtn').onclick = toggleMute;
           document.getElementById('end').onclick = endCall;
         } catch(e) { alert("Ошибка доступа к микрофону"); call.close(); endCall(); }
       };
@@ -690,27 +683,64 @@
       document.getElementById('callAvatar').textContent = document.getElementById('headerName').textContent[0].toUpperCase();
       document.getElementById('callName').textContent = document.getElementById('headerName').textContent;
       document.getElementById('callStatus').textContent = 'Вызов...';
-      document.getElementById('callActions').innerHTML = `<button class="call-btn-action end" id="end">📴</button>`;
+      document.getElementById('callActions').innerHTML = `
+        <button class="call-btn-action mute" id="muteBtn" title="Микрофон">🎤</button>
+        <button class="call-btn-action end" id="end">📴</button>
+      `;
+      document.getElementById('muteBtn').onclick = toggleMute;
       document.getElementById('end').onclick = endCall;
       document.getElementById('callModal').classList.add('active');
       setupCall(call);
     } catch (e) { alert("Нет доступа к микрофону"); }
   };
 
+  // Функция для принудительного воспроизведения звука и обработки ошибок автоплея
   function setupCall(call) {
     call.on('stream', (stream) => {
-      document.getElementById('remoteAudio').srcObject = stream;
+      const audioEl = document.getElementById('remoteAudio');
+      audioEl.srcObject = stream;
+      
+      // Принудительное воспроизведение
+      audioEl.play().catch(err => {
+        console.log("Autoplay blocked:", err);
+        document.getElementById('callStatus').textContent = "Нажмите, чтобы включить звук";
+        
+        // Обработчик клика для включения звука
+        document.getElementById('callModal').onclick = () => {
+          audioEl.play();
+          document.getElementById('callStatus').textContent = 'Разговор...';
+          document.getElementById('callModal').onclick = null;
+        };
+      });
+      
       document.getElementById('callStatus').textContent = 'Разговор...';
     });
     call.on('close', endCall);
     call.on('error', endCall);
   }
 
+  // Кнопка выключения микрофона
+  function toggleMute() {
+    if (!localStream) return;
+    isMuted = !isMuted;
+    localStream.getAudioTracks().forEach(track => track.enabled = !isMuted);
+    const btn = document.getElementById('muteBtn');
+    if (isMuted) {
+      btn.classList.add('muted');
+      btn.innerHTML = '🔇';
+    } else {
+      btn.classList.remove('muted');
+      btn.innerHTML = '🎤';
+    }
+  }
+
   function endCall() {
     if (currentCall) { currentCall.close(); currentCall = null; }
     if (localStream) { localStream.getTracks().forEach(t => t.stop()); localStream = null; }
+    isMuted = false;
     document.getElementById('remoteAudio').srcObject = null;
     document.getElementById('callModal').classList.remove('active');
+    document.getElementById('callModal').onclick = null;
   }
 </script>
 </body>
