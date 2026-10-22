@@ -613,4 +613,4 @@ body{background-color:var(--bg-color);color:var(--text-main);height:100vh;height
   function endCall() { if (currentCall) { currentCall.close(); currentCall = null; } if (localStream) { localStream.getTracks().forEach(t => t.stop()); localStream = null; } peerConnection = null; document.getElementById('remoteVideo').srcObject = null; document.getElementById('localVideo').srcObject = null; document.getElementById('remoteAudio').srcObject = null; document.getElementById('remoteVideo').style.display = 'none'; document.getElementById('localVideo').style.display = 'none'; document.getElementById('callUI').style.display = 'flex'; document.getElementById('callModal').classList.remove('active'); }
 </script>
 </body>
-</html>
+                                                                </html>
